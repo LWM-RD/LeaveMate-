@@ -1,0 +1,7 @@
+{
+  "name": "LeaveMate - නිවාඩු සහ පැමිණීම් කළමනාකරණය",
+  "description": "සේවක නිවාඩු සහ දෛනික පැමිණීම් පහසුවෙන් කළමනාකරණය කර ගැනීමේ පද්ධතිය (Leave and Attendance Tracker)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

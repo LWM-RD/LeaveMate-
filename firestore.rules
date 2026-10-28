@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidLeave(data) {
+      return data.year is number && data.year >= 2000 && data.year <= 2100 &&
+             data.category in ['annual', 'casual', 'sick', 'special'] &&
+             data.duration in ['full', 'half_morning', 'half_evening', 'multiple'] &&
+             data.startDate is string && data.startDate.size() == 10 &&
+             data.endDate is string && data.endDate.size() == 10 &&
+             data.daysCount is number && data.daysCount > 0 && data.daysCount <= 366 &&
+             data.reason is string && data.reason.size() <= 1000;
+    }
+
+    function isValidQuota(data) {
+      return data.year is number && data.year >= 2000 && data.year <= 2100 &&
+             data.annual is number && data.annual >= 0 && data.annual <= 100 &&
+             data.casual is number && data.casual >= 0 && data.casual <= 100 &&
+             data.sick is number && data.sick >= 0 && data.sick <= 100 &&
+             data.special is number && data.special >= 0 && data.special <= 100;
+    }
+
+    // Direct leaves collection accessible by applet
+    match /leaves/{leaveId} {
+      allow read: if true;
+      allow create: if isValidId(leaveId) && isValidLeave(incoming());
+      allow update: if isValidId(leaveId) && isValidLeave(incoming());
+      allow delete: if isValidId(leaveId);
+    }
+
+    // Direct quotas collection accessible by applet
+    match /quotas/{year} {
+      allow read: if true;
+      allow create: if isValidId(year) && isValidQuota(incoming());
+      allow update: if isValidId(year) && isValidQuota(incoming());
+      allow delete: if isValidId(year);
+    }
+
+    // Support user-scoped subcollections if authenticated
+    match /users/{userId}/leaves/{leaveId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId}/quotas/{year} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default deny for anything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

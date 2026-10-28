@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Leave": {
+      "title": "Leave",
+      "description": "Represents a personal leave record taken or planned by the user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the leave record" },
+        "year": { "type": "number", "description": "Calendar year of the leave" },
+        "category": { "type": "string", "enum": ["annual", "casual", "sick", "special"], "description": "Leave category" },
+        "duration": { "type": "string", "enum": ["full", "half_morning", "half_evening", "multiple"], "description": "Full day or half day duration" },
+        "startDate": { "type": "string", "description": "Start date in YYYY-MM-DD format" },
+        "endDate": { "type": "string", "description": "End date in YYYY-MM-DD format" },
+        "daysCount": { "type": "number", "description": "Number of days taken (e.g. 0.5, 1, 2)" },
+        "reason": { "type": "string", "description": "Reason or note for taking the leave" },
+        "status": { "type": "string", "enum": ["taken", "planned"], "description": "Status of the leave" },
+        "appliedDate": { "type": "string", "description": "Application date in YYYY-MM-DD format" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["year", "category", "duration", "startDate", "endDate", "daysCount", "reason"]
+    },
+    "Quota": {
+      "title": "Quota",
+      "description": "Annual leave quota allocation for a specific calendar year.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier / year key" },
+        "year": { "type": "number", "description": "Calendar year" },
+        "annual": { "type": "number", "description": "Annual leaves allowed" },
+        "casual": { "type": "number", "description": "Casual leaves allowed" },
+        "sick": { "type": "number", "description": "Sick leaves allowed" },
+        "special": { "type": "number", "description": "Special leaves allowed" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["year", "annual", "casual", "sick", "special"]
+    }
+  },
+  "firestore": {
+    "/leaves/{leaveId}": {
+      "schema": "Leave",
+      "description": "Global leave entries stored in Firestore."
+    },
+    "/quotas/{year}": {
+      "schema": "Quota",
+      "description": "Annual quotas stored in Firestore by year."
+    }
+  }
+}
